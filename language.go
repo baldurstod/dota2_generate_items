@@ -2,7 +2,6 @@ package main
 
 import (
 	"strings"
-	_ "fmt"
 	//"github.com/baldurstod/vdf"
 )
 
