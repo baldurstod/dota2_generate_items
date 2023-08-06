@@ -703,19 +703,16 @@ func (this *item) MarshalJSON() ([]byte, error) {
 
 
 	if bundle, ok := this.kv.Get("bundle"); ok {
-		ret["bundle"] = bundle
-		panic("do bundles")
+		if sm, ok := bundle.ToStringMap(); ok {
+			items := []string{}
+			for key, val := range *sm {
+				if val == "1" {
+					items = append(items, key)
+				}
+			}
+			ret["bundle"] = items
+		}
 	}
-
-
-//ret[outKey] = s
-	//asset_modifier
-
-	//particles/units/heroes/hero_tiny/tiny_ambient.vpcf
-
-
-
-	//fmt.Println(this.getStringAttribute("baseitem"))
 
 	return json.Marshal(ret)
 }
