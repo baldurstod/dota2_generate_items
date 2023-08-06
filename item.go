@@ -67,40 +67,6 @@ func (this *item) getStringAttribute(attributeName string) (string, bool) {
 	return "", false
 }
 
-func (this *item) getStringSubAttribute(attributePath string) (string, bool) {
-	path := strings.Split(attributePath, ".")
-
-	current := this.kv
-ForLoop:
-	for _, p := range path {
-		next, ok := current.Get(p)
-		if !ok {
-			break ForLoop
-		}
-		switch next.value.(type) {
-			case nil:
-				break ForLoop
-			case []*KeyValue:
-				//current = itemGameMap((next).(map[string]interface{}))
-				current = next//(next.value).(*KeyValue)
-			case string:
-				return next.value.(string), true
-			default:
-				fmt.Println(next)
-				panic("Unknown type")
-		}
-		//current = (next.value).(*KeyValue)//current = itemGameMap((next).(map[string]interface{}))
-	}
-
-	for _, prefab := range this.prefabs {
-		if s, ok := prefab.getStringSubAttribute(attributePath); ok {
-			return s, true
-		}
-	}
-
-	return "", false
-}
-
 func (this *item) getUsedByHeroes() []string {
 	ret := []string{}
 
@@ -110,7 +76,6 @@ func (this *item) getUsedByHeroes() []string {
 				ret = append(ret, key)
 			}
 		}
-		//fmt.Println(this.Id, ret)
 	}
 	return ret
 }
@@ -183,25 +148,4 @@ func (this *item) MarshalVisuals(ret *map[string]interface{}) {
 		(*ret)["styles"] = styles
 	}*/
 
-}
-
-func (this itemGameMap) getMapStringValue(key string) (string, bool) {
-	if mapValue := this[key]; mapValue != nil {
-		switch mapValue.(type) {
-			case string:
-				return mapValue.(string), true
-			default:
-				return "", false
-		}
-	}
-	return "", false
-}
-
-func (this *itemGameMap) getMapIntValue(key string) (int, bool) {
-	if mapValue := (*this)[key]; mapValue != nil {
-		if i, err := strconv.Atoi(mapValue.(string)); err == nil {
-			return i, true
-		}
-	}
-	return 0, false
 }
