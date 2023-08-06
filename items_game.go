@@ -5,12 +5,11 @@ import (
 	"fmt"
 	"strings"
 	"strconv"
-	"encoding/json"
+	_ "encoding/json"
 	//"github.com/baldurstod/vdf"
 )
 
 type itemMap map[string]*item
-type itemStyleMap map[string]*itemStyle
 type itemGameMap map[string]interface{}
 type itemStringMap map[string]string
 type stringPair struct {
@@ -26,64 +25,6 @@ type itemsGame struct {
 	Prefabs itemMap
 	Items itemMap
 	itemCollection collectionMap
-}
-
-func (this *itemsGame) MarshalJSON() ([]byte, error) {
-	ret := make(itemGameMap)
-
-	ret["items"] = *this.MarshalItems()
-	ret["systems"] = *this.MarshalSystems()
-
-	return json.Marshal(ret)
-}
-
-func (this *itemsGame) MarshalItems() *itemStyleMap {
-	items := make(itemStyleMap)
-	for itemId, item := range *this.getItems() {
-		item.getUsedByHeroes()
-		styles := item.getStyles()
-		if len(styles) > 1 {
-			for _, styleId := range styles {
-				items[itemId + "~" + styleId] = &itemStyle{it: item, styleId: styleId}
-			}
-		} else {
-			items[itemId] = &itemStyle{it: item, styleId: "0"}
-		}
-	}
-
-	/*for itemId, itemData := range this.staticData {
-		it := item{}
-		if it.init(this, itemId, getMap(itemData)) {
-			items[itemId] = &itemStyle{it: &it, styleId: "0"}
-		}
-	}*/
-
-	return &items
-}
-
-func (this *itemsGame) MarshalSystems() *itemGameMap {
-	systems := make(itemGameMap)
-
-	if particles, ok := this.itemsVDF.Get("attribute_controlled_attached_particles"); ok {//getMap(getMap(this.itemsVDF)["attribute_controlled_attached_particles"])
-		//fmt.Println(particles, ok)
-		for _, val := range particles.GetChilds() {
-			subParticles := val.GetChilds()
-			for _, val := range subParticles {
-				particleId := val.key
-				systems[particleId] = val.GetChilds()
-
-				if s, ok := getStringTokenRaw("Attrib_Particle" + particleId); ok {
-					panic(s)//getMap(systems[particleId])["name"] = s
-				} else {
-					if s, ok := getStringTokenRaw("Attrib_KillStreakEffect" + particleId); ok {
-						panic(s)//getMap(systems[particleId])["name"] = s
-					}
-				}
-			}
-		}
-	}
-
-	return &systems
 }
 
 func (this *itemsGame) getItems() (*itemMap) {
