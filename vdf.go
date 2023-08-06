@@ -66,14 +66,7 @@ func (this KeyValue) Get(key string) (*KeyValue, bool) {
 	return nil, false
 }
 
-func (this KeyValue) GetSubElement(path []string/*, params ...string*/) (*KeyValue, bool) {
-	/*separator := "."
-	if len(params) == 1 {
-		separator = params[0]
-	}
-	paths := strings.Split(path, separator)*/
-
-	fmt.Println(path[0]/*, path[1:]*/)
+func (this KeyValue) GetSubElement(path []string) (*KeyValue, bool) {
 	if subElement, ok := this.Get(path[0]); ok {
 		if len(path) == 1 {
 			return subElement, true
