@@ -3,9 +3,7 @@ package main
 import (
 	"github.com/golang-collections/collections/stack"
 	"unicode/utf8"
-	_ "log"
 	"fmt"
-	_ "reflect"
 	"encoding/json"
 )
 
@@ -51,7 +49,6 @@ func (this KeyValue) GetString(key string) (string, bool) {
 }
 
 func (this KeyValue) Get(key string) (*KeyValue, bool) {
-	//fmt.Println(reflect.TypeOf(this.value))
 	switch this.value.(type) {
 	case string:
 		return nil, false
@@ -93,8 +90,6 @@ func (this KeyValue) ToStringMap() (*map[string]string, bool) {
 		for _, item := range arr {
 			switch item.value.(type) {
 			case string:
-				//fmt.Println(item)
-				//panic("remove me")
 				ret[item.key] = item.value.(string)
 			}
 		}
@@ -170,12 +165,11 @@ func (this *KeyValue) toJSON() interface{} {
 
 	switch this.value.(type) {
 	case string:
-		//ret[this.key] = this.value.(string)
 		return this.value.(string)
 	case []*KeyValue:
 		arr := this.value.([]*KeyValue)
-		for _, item := range arr {
-			ret[item.key] = item.toJSON()
+		for _, kv := range arr {
+			ret[kv.key] = kv.toJSON()
 		}
 	}
 
@@ -183,22 +177,7 @@ func (this *KeyValue) toJSON() interface{} {
 }
 
 func (this KeyValue) MarshalJSON() ([]byte, error) {
-	//ret := make(map[string]interface{})
 	var ret interface{}
-
-	//fmt.Println(this)
-
-/*	switch this.value.(type) {
-	case string:
-		ret[this.key] = this.value.(string)
-	case []*KeyValue:
-		arr := this.value.([]*KeyValue)
-		for _, item := range arr {
-			ret[item.key] = item.toJSON()
-			fmt.Println(item.key, item.value)
-		}
-	}
-	*/
 
 	ret = this.toJSON()
 
@@ -210,11 +189,10 @@ func (this *VDF) Parse(s []byte) KeyValue {
 	this.s = s
 	this.i = 0
 	this.len = len(s)
-	//result := KeyValue{value: []*KeyValue{}}
 
 	stringStack := stack.New()
 	levelStack := stack.New()
-	//currentLevel := &result
+
 	var currentLevel *KeyValue = &KeyValue{key: "root", value: []*KeyValue{}, isRoot: true}
 	var result KeyValue
 
@@ -246,10 +224,8 @@ TokenLoop:
 		case stringValue: stringStack.Push(s)
 		case endToken: break TokenLoop
 		}
-
 	}
 
-	//result.Print()
 	return result
 }
 
