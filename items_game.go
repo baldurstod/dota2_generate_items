@@ -3,8 +3,8 @@ package main
 import (
 	_ "os"
 	"fmt"
-	"strings"
-	"strconv"
+	_ "strings"
+	_ "strconv"
 	_ "encoding/json"
 	//"github.com/baldurstod/vdf"
 )
@@ -31,99 +31,9 @@ func (this *itemsGame) getItems() (*itemMap) {
 	items := make(itemMap)
 
 	for itemId, item := range this.Items {
-		if !this.filterOut(item, !this.medals) {
-			items[itemId] = item
-		}
+		items[itemId] = item
 	}
 	return &items
-}
-
-func (this *itemsGame) filterOut(it *item, filterMedals bool) (bool) {
-	return false
-	it.initPrefabs()
-	//fmt.Println(filterMedals)
-
-	itemId, _ := strconv.Atoi(it.Id)
-
-	if itemId == 5838 { //Winter 2015 Mystery Box
-		return true
-	}
-
-	// Filter medals
-	/*if s, ok := it.getStringAttribute("item_type_name"); ok {
-		if filterMedals {
-			if s == "#TF_Wearable_TournamentMedal" {
-				return true
-			}
-		} else {
-			if s != "#TF_Wearable_TournamentMedal" {
-				return true
-			}
-		}
-	}*/
-
-	if s, ok := it.getStringAttribute("item_name"); ok {
-		if s == "#TF_Item_Zombie_Armory" {
-			return true
-		}
-	}
-
-	if s, ok := it.getStringAttribute("name"); ok {
-		if strings.Contains(s, "Autogrant") {
-			return true
-		}
-	}
-
-	if s, ok := it.getStringAttribute("item_class"); ok {
-		if s == "tf_weapon_invis" {
-			return true
-		}
-	}
-
-	if s, ok := it.getStringAttribute("baseitem"); ok {
-		if s == "1" {
-			if itemId != 26 && itemId != 27 {//destruction PDA and disguise kit
-				return true;
-			}
-		}
-	}
-
-	// Filter show_in_armory
-	if s, ok := it.getStringAttribute("show_in_armory"); ok {
-		if s == "0" {
-			if s, ok := it.getStringAttribute("name"); ok && s != "Duck Badge" {
-				if itemId == 294 || (itemId >= 831 && itemId <= 838) || (itemId >= 30739 && itemId <= 30741) {
-				} else {
-					return true
-				}
-			}
-		}
-	}
-
-	// Filter items whitout models excepts a few (hatless...)
-	if s, ok := it.getStringAttribute("model_player"); !ok || s == "" {
-		if _, ok := it.getStringAttribute("model_player_per_class"); !ok {
-			if _, ok := it.getStringAttribute("extra_wearable"); !ok {
-				if itemSlot, ok := it.getStringAttribute("item_slot"); ok {
-					if strings.Contains(itemSlot, "action") {
-						return true
-					}
-				} else {
-					return true
-				}
-			}
-		}
-	}
-
-	usedByClasses := make(itemStringMap)
-	it.getStringMapAttribute("used_by_classes", &usedByClasses)
-	if len(usedByClasses) == 0 {
-		return true
-	}
-
-
-
-	return false
 }
 
 func (this *itemsGame) init(dat []byte) {
@@ -196,15 +106,6 @@ func (this *itemsGame) init(dat []byte) {
 
 func (this *itemsGame) getPrefab(prefabName string) *item {
 	return this.Prefabs[prefabName]
-}
-
-func (this *itemsGame) getItemCollection(it *item) (string, string, bool) {
-	if s, ok := it.getStringAttribute("name"); ok {
-		if itemCollection, exists := this.itemCollection[s]; exists {
-			return itemCollection.s1, itemCollection.s2, true
-		}
-	}
-	return "", "", false
 }
 
 func (this *itemsGame) getItemsPerHero() map[string]*hero {

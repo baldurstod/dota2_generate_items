@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"reflect"
+	_ "reflect"
 	"encoding/json"
 )
 
@@ -53,119 +53,6 @@ func (this *item) initPrefabs() {
 		}
 	}
 }
-
-func (this *item) getStringMapAttribute(attributeName string, i *itemStringMap) {
-	if v, ok := this.kv.Get(attributeName); ok {
-		switch v.value.(type) {
-		case map[string]interface{}:
-			mapValue := itemGameMap((v.value).(map[string]interface{}))
-			for key, val := range mapValue {
-				switch val.(type) {
-				case string:
-					(*i)[key] = val.(string)
-				}
-			}
-		}
-	}
-
-	for _, prefab := range this.prefabs {
-		prefab.getStringMapAttribute(attributeName, i)
-	}
-}
-
-func (this *item) getStringMapSubAttribute(attributePath string, i *itemStringMap) {
-	path := strings.Split(attributePath, ".")
-
-	current := this.kv
-
-ForLoop:
-	for _, p := range path {
-		next, ok := current.Get(p)
-		if !ok {
-			current = nil
-			break ForLoop
-		}
-		switch next.value.(type) {
-			case nil:
-				current = nil
-				break ForLoop
-			case []*KeyValue:
-				//current = (next.value).(*KeyValue)
-				current = next
-			case string:
-				panic("Found a string " + attributePath + this.Id)
-			default:
-				fmt.Println(next)
-				panic("Unknown type")
-		}
-		//current = (next.value).(*KeyValue)//itemGameMap((next).(map[string]interface{}))
-	}
-
-	for _, prefab := range this.prefabs {
-		prefab.getStringMapSubAttribute(attributePath, i)
-	}
-
-	if current != nil {
-		for key, val := range current.GetChilds() {
-			switch val.value.(type) {
-			case string:
-				fmt.Println(key)
-				panic("TODO")//(*i)[key] = val.value.(string)
-			}
-		}
-	}
-
-	return
-}
-
-func (this *item) getSubAttribute(attributePath string, i *itemGameMap) {
-	path := strings.Split(attributePath, ".")
-
-	current := this.kv
-
-ForLoop:
-	for _, p := range path {
-		next, ok := current.Get(p)
-		if !ok {
-			current = nil
-			break ForLoop
-		}
-		switch next.value.(type) {
-			case nil:
-				current = nil
-				break ForLoop
-			case []*KeyValue:
-				//current = itemGameMap((next).(map[string]interface{}))
-				current = next//(next.value).([]*KeyValue)
-			case string:
-				//return next.(string), true
-				panic("Found a string " + attributePath + this.Id)
-			default:
-				fmt.Println(next.value, reflect.TypeOf(next.value))
-				panic("Unknown type")
-		}
-		//current = (next.value).(*KeyValue)//current = itemGameMap((next).(map[string]interface{}))
-	}
-	for _, prefab := range this.prefabs {
-		prefab.getSubAttribute(attributePath, i)
-	}
-
-	if current != nil {
-		for key, val := range current.GetChilds() {
-			switch val.value.(type) {
-			case map[string]interface{}: //(*i)[key] = itemGameMap((val).(map[string]interface{}))
-				fmt.Println(key)
-				panic("TODO")
-			case string: //(*i)[key] = val.(string)
-				fmt.Println(key)
-				panic("TODO")
-			}
-		}
-	}
-
-	return
-}
-
 
 func (this *item) getStringAttribute(attributeName string) (string, bool) {
 	if s, ok := this.kv.GetString(attributeName); ok {
