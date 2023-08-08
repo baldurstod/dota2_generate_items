@@ -50,7 +50,7 @@ func main() {
 
 	for npc, hero := range heroes {
 		j, _ := json.MarshalIndent(hero, "", "\t")
-		os.WriteFile(path.Join(outputFolder, "test", npc + ".json"), j, 0666)
+		os.WriteFile(path.Join(outputFolder, npc + ".json"), j, 0666)
 	}
 }
 
