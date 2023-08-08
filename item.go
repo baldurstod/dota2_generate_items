@@ -4,6 +4,7 @@ import (
 	"strconv"
 	"strings"
 	"encoding/json"
+	"github.com/baldurstod/vdf"
 )
 
 var ITEM_FIELDS = map[string]string{
@@ -24,12 +25,12 @@ type item struct {
 	Prefab string
 	prefabs []*item
 	isPrefabsInitialized bool `default:false`
-	kv *KeyValue
+	kv *vdf.KeyValue
 }
 
-func (this *item) init(ig *itemsGame, kv *KeyValue) bool {
+func (this *item) init(ig *itemsGame, kv *vdf.KeyValue) bool {
 	this.ig = ig
-	this.Id = kv.key
+	this.Id = kv.Key
 	this.kv = kv
 
 	return true
@@ -116,31 +117,19 @@ func (this *item) MarshalJSON() ([]byte, error) {
 func (this *item) MarshalVisuals(ret *map[string]interface{}) {
 
 	modifiers := []interface{}{}
-	//styles := []interface{}{}
 
 	if visuals, ok := this.kv.Get("visuals"); ok {
-		for _, kv := range visuals.value.([]*KeyValue) {
-			if strings.HasPrefix(kv.key, "asset_modifier") {
+		for _, kv := range visuals.Value.([]*vdf.KeyValue) {
+			if strings.HasPrefix(kv.Key, "asset_modifier") {
 				modifiers = append(modifiers, kv)
 			}
-			if strings.HasPrefix(kv.key, "styles") {
-				//fmt.Println(kv.key)
-				//styles = append(styles, kv)
-
+			if strings.HasPrefix(kv.Key, "styles") {
 				(*ret)["styles"] = kv
 			}
-
-			/*if val == "1" {
-				ret = append(ret, key)
-			}*/
 		}
 	}
 
 	if len(modifiers) > 0 {
 		(*ret)["assetmodifiers"] = modifiers
 	}
-	/*if len(styles) > 0 {
-		(*ret)["styles"] = styles
-	}*/
-
 }

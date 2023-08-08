@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 	"strings"
-	//"github.com/baldurstod/vdf"
+	"github.com/baldurstod/vdf"
 )
 
 type language struct {
@@ -13,8 +13,8 @@ type language struct {
 
 func (this *language) init(path string) {
 	dat, _ := os.ReadFile(path)
-	vdf := VDF{}
-	languageVdf := vdf.Parse(dat)
+	v := vdf.VDF{}
+	languageVdf := v.Parse(dat)
 
 	lang, ok := languageVdf.Get("lang")
 	if !ok {
@@ -32,8 +32,8 @@ func (this *language) init(path string) {
 
 	this.lang = language
 	this.tokens = make(map[string]string)
-	for _, val := range tokens.value.([]*KeyValue) {
-		this.tokens[strings.ToLower(val.key)] = val.value.(string)
+	for _, val := range tokens.Value.([]*vdf.KeyValue) {
+		this.tokens[strings.ToLower(val.Key)] = val.Value.(string)
 	}
 }
 

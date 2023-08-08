@@ -1,14 +1,14 @@
 package main
 
 import (
-	//"github.com/baldurstod/vdf"
+	"github.com/baldurstod/vdf"
 )
 
 type itemMap map[string]*item
 
 type itemsGame struct {
 	medals bool `default:false`
-	itemsVDF *KeyValue
+	itemsVDF *vdf.KeyValue
 	Prefabs itemMap
 	Items itemMap
 }
@@ -23,7 +23,7 @@ func (this *itemsGame) getItems() (*itemMap) {
 }
 
 func (this *itemsGame) init(dat []byte) {
-	vdf := VDF{}
+	vdf := vdf.VDF{}
 	root := vdf.Parse(dat)
 	this.itemsVDF, _ = root.Get("items_game")
 	this.Prefabs = make(itemMap)
