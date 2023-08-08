@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"strings"
 	//"github.com/baldurstod/vdf"
 )
@@ -11,7 +12,7 @@ type language struct {
 }
 
 func (this *language) init(path string) {
-	dat, _ := ReadFileUTF16(path)
+	dat, _ := os.ReadFile(path)
 	vdf := VDF{}
 	languageVdf := vdf.Parse(dat)
 
