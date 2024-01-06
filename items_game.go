@@ -6,6 +6,7 @@ import (
 
 type itemMap map[string]*item
 type colorMap map[string]*color
+type particleMap map[string]*particle
 
 type itemsGame struct {
 	medals bool `default:false`
@@ -13,6 +14,7 @@ type itemsGame struct {
 	Prefabs itemMap
 	Items itemMap
 	Colors colorMap
+	Particles particleMap
 }
 
 func (this *itemsGame) getItems() (*itemMap) {
@@ -31,6 +33,7 @@ func (this *itemsGame) init(dat []byte) {
 	this.Prefabs = make(itemMap)
 	this.Items = make(itemMap)
 	this.Colors = make(colorMap)
+	this.Particles = make(particleMap)
 
 	if prefabs, ok := this.itemsVDF.Get("prefabs"); ok {
 		for _, val := range prefabs.GetChilds() {
@@ -55,6 +58,15 @@ func (this *itemsGame) init(dat []byte) {
 			var c = color{}
 			if c.init(this, val) {
 				this.Colors[c.Id] = &c
+			}
+		}
+	}
+
+	if particles, ok := this.itemsVDF.Get("attribute_controlled_attached_particles"); ok {
+		for _, val := range particles.GetChilds() {
+			var p = particle{}
+			if p.init(this, val) {
+				this.Particles[p.Id] = &p
 			}
 		}
 	}
@@ -90,6 +102,16 @@ func (this *itemsGame) getColors() []*color {
 
 	for _, color := range this.Colors {
 		ret = append(ret, color)
+	}
+
+	return ret
+}
+
+func (this *itemsGame) getParticles() []*particle {
+	ret := []*particle{}
+
+	for _, particle := range this.Particles {
+		ret = append(ret, particle)
 	}
 
 	return ret
