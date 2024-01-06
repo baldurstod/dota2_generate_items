@@ -8,7 +8,10 @@ import (
 	"fmt"
 	"path"
 )
+
 var lg language
+var dota language
+var languages []*language
 
 func main() {
 	var lang string
@@ -42,6 +45,11 @@ func main() {
 	lg = language{}
 	lg.init(path.Join(resourceFolder, "items_" + lang + ".txt"))
 
+	dota = language{}
+	dota.init(path.Join(resourceFolder, "dota_" + lang + ".txt"))
+
+	languages = []*language{&lg, &dota}
+
 	ig := itemsGame{}
 	itemsGameDatas, _ := os.ReadFile(path.Join(itemsFolder, "items_game.txt"))
 	ig.init(itemsGameDatas)
@@ -55,11 +63,12 @@ func main() {
 }
 
 func getStringToken(token string) string {
-	s, exist := lg.getToken(token)
+	for _, language := range languages {
+		s, exist := language.getToken(token)
 
-	if (exist) {
-		return s
-	} else {
-		return token
+		if (exist) {
+			return s
+		}
 	}
+	return token
 }
