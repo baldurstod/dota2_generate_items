@@ -60,6 +60,9 @@ func main() {
 		j, _ := json.MarshalIndent(hero, "", "\t")
 		os.WriteFile(path.Join(outputFolder, npc + ".json"), j, 0666)
 	}
+
+	j, _ := json.MarshalIndent(ig.getColors(), "", "\t")
+	os.WriteFile(path.Join(outputFolder, "colors.json"), j, 0666)
 }
 
 func getStringToken(token string) string {

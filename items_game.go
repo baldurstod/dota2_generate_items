@@ -5,12 +5,14 @@ import (
 )
 
 type itemMap map[string]*item
+type colorMap map[string]*color
 
 type itemsGame struct {
 	medals bool `default:false`
 	itemsVDF *vdf.KeyValue
 	Prefabs itemMap
 	Items itemMap
+	Colors colorMap
 }
 
 func (this *itemsGame) getItems() (*itemMap) {
@@ -28,6 +30,7 @@ func (this *itemsGame) init(dat []byte) {
 	this.itemsVDF, _ = root.Get("items_game")
 	this.Prefabs = make(itemMap)
 	this.Items = make(itemMap)
+	this.Colors = make(colorMap)
 
 	if prefabs, ok := this.itemsVDF.Get("prefabs"); ok {
 		for _, val := range prefabs.GetChilds() {
@@ -43,6 +46,15 @@ func (this *itemsGame) init(dat []byte) {
 			var it = item{}
 			if it.init(this, val) {
 				this.Items[it.Id] = &it
+			}
+		}
+	}
+
+	if colors, ok := this.itemsVDF.Get("colors"); ok {
+		for _, val := range colors.GetChilds() {
+			var c = color{}
+			if c.init(this, val) {
+				this.Colors[c.Id] = &c
 			}
 		}
 	}
@@ -71,4 +83,14 @@ func (this *itemsGame) getItemsPerHero() map[string]*hero {
 		}
 	}
 	return heroes
+}
+
+func (this *itemsGame) getColors() []*color {
+	ret := []*color{}
+
+	for _, color := range this.Colors {
+		ret = append(ret, color)
+	}
+
+	return ret
 }
