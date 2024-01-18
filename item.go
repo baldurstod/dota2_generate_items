@@ -124,7 +124,7 @@ func (this *item) MarshalVisuals(ret *map[string]interface{}) {
 				modifiers = append(modifiers, kv)
 			}
 			if strings.HasPrefix(kv.Key, "styles") {
-				(*ret)["styles"] = kv
+				marshalStyles(kv , ret)
 			}
 			if strings.HasPrefix(kv.Key, "skin") {
 				(*ret)["skin"] = kv
@@ -135,4 +135,28 @@ func (this *item) MarshalVisuals(ret *map[string]interface{}) {
 	if len(modifiers) > 0 {
 		(*ret)["assetmodifiers"] = modifiers
 	}
+}
+
+func marshalStyles(kvStyles *vdf.KeyValue, ret *map[string]interface{}) {
+	styles :=  make(map[string]interface{})
+
+	for _, kv := range kvStyles.Value.([]*vdf.KeyValue) {
+		marshalStyle(kv, &styles)
+	}
+
+	(*ret)["styles"] = styles
+}
+
+func marshalStyle(kvStyle *vdf.KeyValue, ret *map[string]interface{}) {
+	style :=  make(map[string]interface{})
+
+	for _, kv := range kvStyle.Value.([]*vdf.KeyValue) {
+		if kv.Key == "name" {
+			style["name"] = getStringToken(kv.Value.(string))
+		} else {
+			style[kv.Key] = kv.Value
+		}
+	}
+
+	(*ret)[kvStyle.Key] = style
 }
