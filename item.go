@@ -72,6 +72,10 @@ func (this *item) getUsedByHeroes() []string {
 				ret = append(ret, key)
 			}
 		}
+	} else {
+		if prefab, ok := this.kv.GetString("prefab"); ok {
+			ret = append(ret, prefab)
+		}
 	}
 	return ret
 }
