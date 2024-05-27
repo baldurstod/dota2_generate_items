@@ -133,6 +133,9 @@ func (this *item) MarshalVisuals(ret *map[string]interface{}) {
 			if strings.HasPrefix(kv.Key, "skin") {
 				(*ret)["skin"] = kv
 			}
+			if strings.HasPrefix(kv.Key, "hide_styles_from_ui") {
+				(*ret)["hide_styles_from_ui"] = kv
+			}
 		}
 	}
 
