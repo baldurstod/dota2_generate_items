@@ -1,31 +1,32 @@
 package main
 
 import (
+	"encoding/json"
 	"strconv"
 	"strings"
-	"encoding/json"
+
 	"github.com/baldurstod/vdf"
 )
 
 var ITEM_FIELDS = map[string]string{
-	"image_inventory": "imageInventory",
-	"model_player": "modelPlayer",
-	"model_player1": "modelPlayer1",
-	"model_player2": "modelPlayer2",
-	"model_player3": "modelPlayer3",
-	"item_slot": "slot",
-	"baseitem": "baseItem",
-	"item_rarity": "rarity",
+	"image_inventory":   "imageInventory",
+	"model_player":      "modelPlayer",
+	"model_player1":     "modelPlayer1",
+	"model_player2":     "modelPlayer2",
+	"model_player3":     "modelPlayer3",
+	"item_slot":         "slot",
+	"baseitem":          "baseItem",
+	"item_rarity":       "rarity",
 	"workshop_accepted": "workshopAccepted",
 }
 
 type item struct {
-	ig *itemsGame
-	Id string
-	Prefab string
-	prefabs []*item
+	ig                   *itemsGame
+	Id                   string
+	Prefab               string
+	prefabs              []*item
 	isPrefabsInitialized bool `default:false`
-	kv *vdf.KeyValue
+	kv                   *vdf.KeyValue
 }
 
 func (this *item) init(ig *itemsGame, kv *vdf.KeyValue) bool {
@@ -56,7 +57,7 @@ func (this *item) getStringAttribute(attributeName string) (string, bool) {
 	}
 
 	for _, prefab := range this.prefabs {
-		if s, ok := prefab.getStringAttribute(attributeName); ok && s != "0" {//TODO: remove s != "0"
+		if s, ok := prefab.getStringAttribute(attributeName); ok && s != "0" { //TODO: remove s != "0"
 			return s, true
 		}
 	}
@@ -102,12 +103,11 @@ func (this *item) MarshalJSON() ([]byte, error) {
 
 	this.MarshalVisuals(&ret)
 
-
 	if bundle, ok := this.kv.Get("bundle"); ok {
 		if sm, ok := bundle.ToStringMap(); ok {
 			items := []string{}
 			for key, val := range *sm {
-				if val == "1" {
+				if val != "0" {
 					items = append(items, key)
 				}
 			}
@@ -128,7 +128,7 @@ func (this *item) MarshalVisuals(ret *map[string]interface{}) {
 				modifiers = append(modifiers, kv)
 			}
 			if strings.HasPrefix(kv.Key, "styles") {
-				marshalStyles(kv , ret)
+				marshalStyles(kv, ret)
 			}
 			if strings.HasPrefix(kv.Key, "skin") {
 				(*ret)["skin"] = kv
@@ -145,7 +145,7 @@ func (this *item) MarshalVisuals(ret *map[string]interface{}) {
 }
 
 func marshalStyles(kvStyles *vdf.KeyValue, ret *map[string]interface{}) {
-	styles :=  make(map[string]interface{})
+	styles := make(map[string]interface{})
 
 	for _, kv := range kvStyles.Value.([]*vdf.KeyValue) {
 		marshalStyle(kv, &styles)
@@ -155,7 +155,7 @@ func marshalStyles(kvStyles *vdf.KeyValue, ret *map[string]interface{}) {
 }
 
 func marshalStyle(kvStyle *vdf.KeyValue, ret *map[string]interface{}) {
-	style :=  make(map[string]interface{})
+	style := make(map[string]interface{})
 
 	for _, kv := range kvStyle.Value.([]*vdf.KeyValue) {
 		if kv.Key == "name" {
