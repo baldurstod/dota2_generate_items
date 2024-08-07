@@ -1,8 +1,9 @@
 package main
 
 import (
-	"strconv"
 	"encoding/json"
+	"strconv"
+
 	"github.com/baldurstod/vdf"
 )
 
@@ -12,27 +13,27 @@ type particle struct {
 	kv *vdf.KeyValue
 }
 
-func (this *particle) init(ig *itemsGame, kv *vdf.KeyValue) bool {
-	this.ig = ig
-	this.Id = kv.Key
-	this.kv = kv
+func (p *particle) init(ig *itemsGame, kv *vdf.KeyValue) bool {
+	p.ig = ig
+	p.Id = kv.Key
+	p.kv = kv
 
 	return true
 }
 
-func (this *particle) getStringAttribute(attributeName string) (string, bool) {
-	if s, ok := this.kv.GetString(attributeName); ok {
+func (p *particle) getStringAttribute(attributeName string) (string, bool) {
+	if s, ok := p.kv.GetString(attributeName); ok {
 		return s, true
 	}
 	return "", false
 }
 
-func (this *particle) MarshalJSON() ([]byte, error) {
+func (p *particle) MarshalJSON() ([]byte, error) {
 	ret := make(map[string]interface{})
 
-	ret["id"], _ = strconv.Atoi(this.Id)
+	ret["id"], _ = strconv.Atoi(p.Id)
 
-	for _, val := range this.kv.GetChilds() {
+	for _, val := range p.kv.GetChilds() {
 		ret[val.Key] = val.Value
 	}
 

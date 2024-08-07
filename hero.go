@@ -5,20 +5,20 @@ import (
 )
 
 type hero struct {
-	npc string
+	npc   string
 	items []*item
 }
 
-func (this *hero) MarshalJSON() ([]byte, error) {
+func (h *hero) MarshalJSON() ([]byte, error) {
 	ret := []interface{}{}
 
-	for _, val := range this.items {
+	for _, val := range h.items {
 		ret = append(ret, val)
 	}
 
 	return json.Marshal(ret)
 }
 
-func (this *hero) addItem(i *item) {
-	this.items = append(this.items, i)
+func (h *hero) addItem(i *item) {
+	h.items = append(h.items, i)
 }

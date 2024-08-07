@@ -1,45 +1,46 @@
 package main
 
 import (
+	"encoding/json"
 	_ "strconv"
 	_ "strings"
-	"encoding/json"
+
 	"github.com/baldurstod/vdf"
 )
 
 type color struct {
-	ig *itemsGame
-	Id string
+	ig   *itemsGame
+	Id   string
 	Name string
-	Hex string
-	kv *vdf.KeyValue
+	Hex  string
+	kv   *vdf.KeyValue
 }
 
-func (this *color) init(ig *itemsGame, kv *vdf.KeyValue) bool {
-	this.ig = ig
-	this.Id = kv.Key
-	this.kv = kv
+func (c *color) init(ig *itemsGame, kv *vdf.KeyValue) bool {
+	c.ig = ig
+	c.Id = kv.Key
+	c.kv = kv
 
 	return true
 }
 
-func (this *color) getStringAttribute(attributeName string) (string, bool) {
-	if s, ok := this.kv.GetString(attributeName); ok {
+func (c *color) getStringAttribute(attributeName string) (string, bool) {
+	if s, ok := c.kv.GetString(attributeName); ok {
 		return s, true
 	}
 	return "", false
 }
 
-func (this *color) MarshalJSON() ([]byte, error) {
+func (c *color) MarshalJSON() ([]byte, error) {
 	ret := make(map[string]interface{})
 
-	ret["id"] = this.Id
+	ret["id"] = c.Id
 
-	if s, ok := this.getStringAttribute("color_name"); ok {
+	if s, ok := c.getStringAttribute("color_name"); ok {
 		ret["color_name"] = getStringToken(s)
 	}
 
-	if s, ok := this.getStringAttribute("hex_color"); ok {
+	if s, ok := c.getStringAttribute("hex_color"); ok {
 		ret["hex_color"] = s
 	}
 
