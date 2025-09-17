@@ -1,8 +1,6 @@
-`go build dota2_generate_items`
+# dota2_generate_items
 
-linux
-
-`SET GOOS=linux&&SET GOARCH=amd64&&go build  dota2_generate_items`
+Build: make build
 
 # Usage
 `dota2_generate_items -o <outputdir> -i <itemsdir> -r <resourcedir> -l <lang>`
