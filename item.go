@@ -107,7 +107,7 @@ func (i *item) MarshalJSON() ([]byte, error) {
 		if sm, ok := bundle.ToStringMap(); ok {
 			items := []string{}
 			for key, val := range *sm {
-				if val != "0" {
+				if val == "1" {
 					items = append(items, key)
 				}
 			}
