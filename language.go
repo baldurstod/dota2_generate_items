@@ -12,8 +12,11 @@ type language struct {
 	tokens map[string]string
 }
 
-func (l *language) init(path string) {
-	dat, _ := os.ReadFile(path)
+func (l *language) init(path string) error {
+	dat, err := os.ReadFile(path)
+	if err != nil {
+		return err
+	}
 	v := vdf.VDF{}
 	languageVdf := v.Parse(dat)
 
@@ -36,6 +39,7 @@ func (l *language) init(path string) {
 	for _, val := range tokens.Value.([]*vdf.KeyValue) {
 		l.tokens[strings.ToLower(val.Key)] = val.Value.(string)
 	}
+	return nil
 }
 
 func (l *language) getToken(token string) (string, bool) {

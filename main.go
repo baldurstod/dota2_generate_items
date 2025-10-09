@@ -2,10 +2,10 @@ package main
 
 import (
 	"encoding/json"
-	"os"
-	_ "log"
 	"flag"
 	"fmt"
+	_ "log"
+	"os"
 	"path"
 )
 
@@ -43,22 +43,34 @@ func main() {
 	}
 
 	lg = language{}
-	lg.init(path.Join(resourceFolder, "items_" + lang + ".txt"))
+	err := lg.init(path.Join(resourceFolder, "items_"+lang+".txt"))
+	if err != nil {
+		fmt.Println("Error while reading lang file:", err)
+		os.Exit(1)
+	}
 
 	dota = language{}
-	dota.init(path.Join(resourceFolder, "dota_" + lang + ".txt"))
+	err = dota.init(path.Join(resourceFolder, "dota_"+lang+".txt"))
+	if err != nil {
+		fmt.Println("Error while reading lang file:", err)
+		os.Exit(1)
+	}
 
 	languages = []*language{&lg, &dota}
 
 	ig := itemsGame{}
-	itemsGameDatas, _ := os.ReadFile(path.Join(itemsFolder, "items_game.txt"))
+	itemsGameDatas, err := os.ReadFile(path.Join(itemsFolder, "items_game.txt"))
+	if err != nil {
+		fmt.Println("Error while reading items file:", err)
+		os.Exit(1)
+	}
 	ig.init(itemsGameDatas)
 
 	heroes := ig.getItemsPerHero()
 
 	for npc, hero := range heroes {
 		j, _ := json.MarshalIndent(hero, "", "\t")
-		os.WriteFile(path.Join(outputFolder, npc + ".json"), j, 0666)
+		os.WriteFile(path.Join(outputFolder, npc+".json"), j, 0666)
 	}
 
 	j, _ := json.MarshalIndent(ig.getColors(), "", "\t")
@@ -72,7 +84,7 @@ func getStringToken(token string) string {
 	for _, language := range languages {
 		s, exist := language.getToken(token)
 
-		if (exist) {
+		if exist {
 			return s
 		}
 	}
