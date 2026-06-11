@@ -40,7 +40,7 @@ func (i *item) init(ig *itemsGame, kv *vdf.KeyValue) bool {
 func (i *item) initPrefabs() {
 	if !i.isPrefabsInitialized {
 		i.isPrefabsInitialized = true
-		if s, ok := i.kv.GetString("prefab"); ok {
+		if s, err := i.kv.GetString("prefab"); err == nil {
 			prefabs := strings.Split(s, " ")
 			for _, prefabName := range prefabs {
 				prefab := i.ig.getPrefab(prefabName)
@@ -52,7 +52,7 @@ func (i *item) initPrefabs() {
 }
 
 func (i *item) getStringAttribute(attributeName string) (string, bool) {
-	if s, ok := i.kv.GetString(attributeName); ok {
+	if s, err := i.kv.GetString(attributeName); err == nil {
 		return s, true
 	}
 
@@ -67,14 +67,14 @@ func (i *item) getStringAttribute(attributeName string) (string, bool) {
 func (i *item) getUsedByHeroes() []string {
 	ret := []string{}
 
-	if usedByHeroes, ok := i.kv.GetStringMap("used_by_heroes"); ok {
+	if usedByHeroes, err := i.kv.GetStringMap("used_by_heroes"); err == nil {
 		for key, val := range *usedByHeroes {
 			if val == "1" {
 				ret = append(ret, key)
 			}
 		}
 	} else {
-		if prefab, ok := i.kv.GetString("prefab"); ok {
+		if prefab, err := i.kv.GetString("prefab"); err == nil {
 			ret = append(ret, prefab)
 		}
 	}
@@ -102,9 +102,10 @@ func (i *item) MarshalJSON() ([]byte, error) {
 	}
 
 	i.MarshalVisuals(&ret)
+	i.MarshalStaticAttributes(&ret)
 
-	if bundle, ok := i.kv.Get("bundle"); ok {
-		if sm, ok := bundle.ToStringMap(); ok {
+	if bundle, err := i.kv.Get("bundle"); err == nil {
+		if sm, err := bundle.ToStringMap(); err == nil {
 			items := []string{}
 			for key, val := range *sm {
 				if val == "1" {
@@ -122,19 +123,21 @@ func (i *item) MarshalVisuals(ret *map[string]interface{}) {
 
 	modifiers := []interface{}{}
 
-	if visuals, ok := i.kv.Get("visuals"); ok {
-		for _, kv := range visuals.Value.([]*vdf.KeyValue) {
-			if strings.HasPrefix(kv.Key, "asset_modifier") {
-				modifiers = append(modifiers, kv)
-			}
-			if strings.HasPrefix(kv.Key, "styles") {
-				marshalStyles(kv, ret)
-			}
-			if strings.HasPrefix(kv.Key, "skin") {
-				(*ret)["skin"] = kv
-			}
-			if strings.HasPrefix(kv.Key, "hide_styles_from_ui") {
-				(*ret)["hide_styles_from_ui"] = kv
+	if visuals, err := i.kv.GetAll("visuals"); err == nil {
+		for _, kv := range visuals {
+			for _, kv := range kv.GetChilds() {
+				if strings.HasPrefix(kv.Key, "asset_modifier") {
+					modifiers = append(modifiers, kv)
+				}
+				if strings.HasPrefix(kv.Key, "styles") {
+					marshalStyles(kv, ret)
+				}
+				if strings.HasPrefix(kv.Key, "skin") {
+					(*ret)["skin"] = kv
+				}
+				if strings.HasPrefix(kv.Key, "hide_styles_from_ui") {
+					(*ret)["hide_styles_from_ui"] = kv
+				}
 			}
 		}
 	}
@@ -144,10 +147,27 @@ func (i *item) MarshalVisuals(ret *map[string]interface{}) {
 	}
 }
 
+func (i *item) MarshalStaticAttributes(ret *map[string]interface{}) {
+	staticAttributes := map[string]interface{}{}
+
+	if attributes, err := i.kv.GetAll("static_attributes"); err == nil {
+		for _, kv := range attributes {
+			for _, kv := range kv.GetChilds() {
+				staticAttributes[kv.Key] = kv
+				//staticAttributes = append(staticAttributes, map[string]interface{}{"key": kv.Key, "value": kv.Value})
+			}
+		}
+	}
+
+	if len(staticAttributes) > 0 {
+		(*ret)["static_attributes"] = staticAttributes
+	}
+}
+
 func marshalStyles(kvStyles *vdf.KeyValue, ret *map[string]interface{}) {
 	styles := make(map[string]interface{})
 
-	for _, kv := range kvStyles.Value.([]*vdf.KeyValue) {
+	for _, kv := range kvStyles.GetChilds() {
 		marshalStyle(kv, &styles)
 	}
 
@@ -157,11 +177,13 @@ func marshalStyles(kvStyles *vdf.KeyValue, ret *map[string]interface{}) {
 func marshalStyle(kvStyle *vdf.KeyValue, ret *map[string]interface{}) {
 	style := make(map[string]interface{})
 
-	for _, kv := range kvStyle.Value.([]*vdf.KeyValue) {
+	for _, kv := range kvStyle.GetChilds() {
 		if kv.Key == "name" {
-			style["name"] = getStringToken(kv.Value.(string))
+			if name, err := kv.ToString(); err == nil {
+				style["name"] = getStringToken(name)
+			}
 		} else {
-			style[kv.Key] = kv.Value
+			style[kv.Key] = kv.GetValue()
 		}
 	}
 

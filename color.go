@@ -25,7 +25,7 @@ func (c *color) init(ig *itemsGame, kv *vdf.KeyValue) bool {
 }
 
 func (c *color) getStringAttribute(attributeName string) (string, bool) {
-	if s, ok := c.kv.GetString(attributeName); ok {
+	if s, err := c.kv.GetString(attributeName); err == nil {
 		return s, true
 	}
 	return "", false

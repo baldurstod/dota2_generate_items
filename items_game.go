@@ -35,7 +35,7 @@ func (ig *itemsGame) init(dat []byte) {
 	ig.Colors = make(colorMap)
 	ig.Particles = make(particleMap)
 
-	if prefabs, ok := ig.itemsVDF.Get("prefabs"); ok {
+	if prefabs, err := ig.itemsVDF.Get("prefabs"); err == nil {
 		for _, val := range prefabs.GetChilds() {
 			var it = item{}
 			if it.init(ig, val) {
@@ -44,7 +44,7 @@ func (ig *itemsGame) init(dat []byte) {
 		}
 	}
 
-	if items, ok := ig.itemsVDF.Get("items"); ok {
+	if items, err := ig.itemsVDF.Get("items"); err == nil {
 		for _, val := range items.GetChilds() {
 			var it = item{}
 			if it.init(ig, val) {
@@ -53,7 +53,7 @@ func (ig *itemsGame) init(dat []byte) {
 		}
 	}
 
-	if colors, ok := ig.itemsVDF.Get("colors"); ok {
+	if colors, err := ig.itemsVDF.Get("colors"); err == nil {
 		for _, val := range colors.GetChilds() {
 			var c = color{}
 			if c.init(ig, val) {
@@ -62,7 +62,7 @@ func (ig *itemsGame) init(dat []byte) {
 		}
 	}
 
-	if particles, ok := ig.itemsVDF.Get("attribute_controlled_attached_particles"); ok {
+	if particles, err := ig.itemsVDF.Get("attribute_controlled_attached_particles"); err == nil {
 		for _, val := range particles.GetChilds() {
 			var p = particle{}
 			if p.init(ig, val) {

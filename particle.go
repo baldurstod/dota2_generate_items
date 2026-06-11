@@ -22,7 +22,7 @@ func (p *particle) init(ig *itemsGame, kv *vdf.KeyValue) bool {
 }
 
 func (p *particle) getStringAttribute(attributeName string) (string, bool) {
-	if s, ok := p.kv.GetString(attributeName); ok {
+	if s, err := p.kv.GetString(attributeName); err == nil {
 		return s, true
 	}
 	return "", false
@@ -34,7 +34,7 @@ func (p *particle) MarshalJSON() ([]byte, error) {
 	ret["id"], _ = strconv.Atoi(p.Id)
 
 	for _, val := range p.kv.GetChilds() {
-		ret[val.Key] = val.Value
+		ret[val.Key] = val.GetValue()
 	}
 
 	return json.Marshal(ret)
